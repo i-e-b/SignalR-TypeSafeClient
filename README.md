@@ -36,8 +36,11 @@ With the two interfaces:
 
 ```
 
+Then, on the client side:
+
 Connecting
 ----------
+
 ```csharp
 
     var conn = new HubConnection("http://localhost:8080/"); // replace with your Hub's location
