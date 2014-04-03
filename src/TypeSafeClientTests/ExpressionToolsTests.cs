@@ -2,7 +2,7 @@
 {
     using System;
     using System.Linq.Expressions;
-    using Management.WorkerRoleContainer.Implementations.Reflection;
+    using NUnit.Framework;
     using TypeSafeClient.Reflection;
 
     [TestFixture]
@@ -103,7 +103,7 @@
         [Test]
         public void can_get_method_name_and_parameter_types_for_a_method_for_binding()
         {
-            var result = ExpressionTools.GetBinding(E(i => i.ComplexMethod));
+            var result = E(i => i.ComplexMethod).GetBinding();
 
             Assert.AreEqual("ComplexMethod", result.MethodName);
             Assert.AreEqual(typeof(int), result.ParameterTypes[0]);

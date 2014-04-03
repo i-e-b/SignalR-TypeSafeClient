@@ -1,25 +1,30 @@
 ﻿namespace TypeSafeClientTests
 {
-    using TypeSafeClient;
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Reflection;
-    using Management.WorkerRoleContainer;
-    using Management.WorkerRoleContainer.Implementations;
     using Microsoft.AspNet.SignalR.Client;
     using Microsoft.AspNet.SignalR.Client.Hubs;
     using Moq;
-    using System.Reflection;
+    using NUnit.Framework;
+    using TypeSafeClient;
 
     [TestFixture]
     public class TypeSafeHubClientTests
     {
-        IHubClient<ISampleCalls, ISampleEvents> _subject;
-        Mock<IHubProxy> _proxyMock;
         Mock<IConnection> _connectionMock;
+        Mock<IHubProxy> _proxyMock;
+        IHubClient<ISampleCalls, ISampleEvents> _subject;
         Subscription _subscription;
+
+        private interface ISampleCalls
+        {
+            void CanHazWurk();
+            int GuessNumber(int max);
+        }
+
+        private interface ISampleEvents
+        {
+            void VisibulWurk(string data, int moreData);
+        }
 
         [SetUp]
         public void Setup()
@@ -71,19 +76,9 @@
             Assert.IsTrue(HasBinding(_subscription));
         }
 
-        #region Type junk
         // ReSharper disable once MemberCanBeMadeStatic.Local
         private void DummyWorker(string arg1, int arg2) { }
 
-        private interface ISampleEvents
-        {
-            void VisibulWurk(string data, int moreData);
-        }
-        private interface ISampleCalls
-        {
-            void CanHazWurk();
-            int GuessNumber(int max);
-        }
         public bool HasBinding(Subscription s)
         {
             // test unfriendly base class :-(
@@ -92,7 +87,6 @@
             if (field == null) Assert.Inconclusive("Could not reflect properties of event subscription");
             return null != field.GetValue(s);
         }
-        #endregion Type junk
     }
 
 }

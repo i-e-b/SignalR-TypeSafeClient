@@ -10,6 +10,17 @@
     /// </summary>
     public static class DynamicProxy
     {
+        private static readonly AssemblyBuilder DynamicAssembly;
+        private static readonly ModuleBuilder ModuleBuilder;
+
+        static DynamicProxy()
+        {
+            var assemblyName = new AssemblyName("DynImpl");
+            DynamicAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(
+                assemblyName, AssemblyBuilderAccess.RunAndSave);
+            ModuleBuilder = DynamicAssembly.DefineDynamicModule("DynImplModule");
+        }
+
         /// <summary>
         /// Get an empty instance of a dynamic proxy for type T.
         /// All public fields are writable and all properties have both getters and setters.
@@ -18,10 +29,6 @@
         {
             return (T)GetInstanceFor(typeof(T));
         }
-
-        private static readonly ModuleBuilder ModuleBuilder;
-
-        private static readonly AssemblyBuilder DynamicAssembly;
 
         /// <summary>
         /// Get an empty instance of a dynamic proxy for the given type.
@@ -40,14 +47,6 @@
         private static string ProxyName(Type targetType)
         {
             return targetType.Name + "Proxy";
-        }
-
-        static DynamicProxy()
-        {
-            var assemblyName = new AssemblyName("DynImpl");
-            DynamicAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(
-                assemblyName, AssemblyBuilderAccess.RunAndSave);
-            ModuleBuilder = DynamicAssembly.DefineDynamicModule("DynImplModule");
         }
 
         private static Type GetConstructedType(Type targetType)
@@ -108,8 +107,8 @@
             {
                 if (methodInfo.ReturnType.IsValueType || methodInfo.ReturnType.IsEnum)
                 {
-                    MethodInfo getMethod = typeof(Activator).GetMethod("CreateInstance", new[] { typeof(Type) });
-                    LocalBuilder lb = methodILGen.DeclareLocal(methodInfo.ReturnType);
+                    var getMethod = typeof(Activator).GetMethod("CreateInstance", new[] { typeof(Type) });
+                    var lb = methodILGen.DeclareLocal(methodInfo.ReturnType);
                     methodILGen.Emit(OpCodes.Ldtoken, lb.LocalType);
                     methodILGen.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle"));
                     methodILGen.Emit(OpCodes.Callvirt, getMethod);
@@ -130,33 +129,33 @@
         public static void BindProperty(TypeBuilder typeBuilder, MethodInfo methodInfo)
         {
             // Backing Field
-            string propertyName = methodInfo.Name.Replace("get_", "");
-            Type propertyType = methodInfo.ReturnType;
-            FieldBuilder backingField = typeBuilder.DefineField(
+            var propertyName = methodInfo.Name.Replace("get_", "");
+            var propertyType = methodInfo.ReturnType;
+            var backingField = typeBuilder.DefineField(
                 "_" + propertyName, propertyType, FieldAttributes.Private);
 
             //Getter
-            MethodBuilder backingGet = typeBuilder.DefineMethod(
+            var backingGet = typeBuilder.DefineMethod(
                 "get_" + propertyName,
                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.Virtual
                 | MethodAttributes.HideBySig,
                 propertyType,
                 Type.EmptyTypes);
-            ILGenerator getIl = backingGet.GetILGenerator();
+            var getIl = backingGet.GetILGenerator();
 
             getIl.Emit(OpCodes.Ldarg_0);
             getIl.Emit(OpCodes.Ldfld, backingField);
             getIl.Emit(OpCodes.Ret);
 
             //Setter
-            MethodBuilder backingSet = typeBuilder.DefineMethod(
+            var backingSet = typeBuilder.DefineMethod(
                 "set_" + propertyName,
                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.Virtual
                 | MethodAttributes.HideBySig,
                 null,
                 new[] { propertyType });
 
-            ILGenerator setIl = backingSet.GetILGenerator();
+            var setIl = backingSet.GetILGenerator();
 
             setIl.Emit(OpCodes.Ldarg_0);
             setIl.Emit(OpCodes.Ldarg_1);
@@ -164,7 +163,7 @@
             setIl.Emit(OpCodes.Ret);
 
             // Property
-            PropertyBuilder propertyBuilder = typeBuilder.DefineProperty(
+            var propertyBuilder = typeBuilder.DefineProperty(
                 propertyName, PropertyAttributes.None, propertyType, null);
             propertyBuilder.SetGetMethod(backingGet);
             propertyBuilder.SetSetMethod(backingSet);
