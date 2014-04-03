@@ -13,7 +13,7 @@ For this readme, we assume a Hub like:
 ```csharp
 
     [HubName("MyHub")]
-    public class ScheduledTaskQueueHub : Hub, IRequests, IEvents
+    public class MyHub : Hub, IRequests, IEvents
     {
         . . .
     }
