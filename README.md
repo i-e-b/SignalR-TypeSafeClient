@@ -12,7 +12,7 @@ Contracts and Hub
 For this readme, we assume a Hub like:
 ```csharp
 
-    [HubName(HubNames.ScheduledTaskQueueHub)]
+    [HubName("MyHub")]
     public class ScheduledTaskQueueHub : Hub, IRequests, IEvents
     {
         . . .
@@ -77,11 +77,12 @@ will call these methods
     void HandleIncomingStuff(string stuff) { . . . }
     void AlertSessionExpired() { . . . }
 
-``
+```
 
 Sending Requests
 ----------------
 
+For calls that have no return use `SendToHub`. For calls requiring a synchronous result, use `RequestFromHub`.
 ```csharp
 
     _client.SendToHub(hub => hub.IWantStuff(new []{"stuff1", "stuff2"}));
