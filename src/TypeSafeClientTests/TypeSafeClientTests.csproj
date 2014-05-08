@@ -46,6 +46,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DisconnectionWaitTests.cs" />
+    <Compile Include="ISampleCalls.cs" />
+    <Compile Include="ISampleEvents.cs" />
     <Compile Include="TypeSafeHubClientTests.cs" />
     <Compile Include="ExpressionToolsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

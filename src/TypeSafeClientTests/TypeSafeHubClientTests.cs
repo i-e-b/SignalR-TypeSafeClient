@@ -15,16 +15,6 @@
         IHubClient<ISampleCalls, ISampleEvents> _subject;
         Subscription _subscription;
 
-        private interface ISampleCalls
-        {
-            void CanHazWurk();
-            int GuessNumber(int max);
-        }
-
-        private interface ISampleEvents
-        {
-            void VisibulWurk(string data, int moreData);
-        }
 
         [SetUp]
         public void Setup()
@@ -34,6 +24,7 @@
             _proxyMock = new Mock<IHubProxy>();
             _proxyMock.Setup(m => m.Subscribe(It.IsAny<string>())).Returns(_subscription);
             _connectionMock = new Mock<IConnection>();
+            _connectionMock.Setup(m => m.State).Returns(ConnectionState.Connected);
 
             _subject = new HubClient<ISampleCalls, ISampleEvents>(_proxyMock.Object, _connectionMock.Object);
         }

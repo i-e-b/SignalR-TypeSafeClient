@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Threading;
     using Microsoft.AspNet.SignalR.Client;
@@ -136,6 +137,8 @@
         {
             var invocation = call.GetInvocation();
 
+            WaitForConnection();
+
             var task = _proxy.Invoke(invocation.MethodName, invocation.ParameterValues);
             if (task == null) throw new Exception("Could not contact hub");
             task.Wait();
@@ -149,6 +152,8 @@
         public TResult RequestFromHub<TResult>(Expression<Func<TCalls, TResult>> call)
         {
             var invocation = call.GetInvocation();
+
+            WaitForConnection();
 
             var task = _proxy.Invoke<TResult>(invocation.MethodName, invocation.ParameterValues);
             if (task == null) throw new Exception("Could not contact hub");
@@ -164,6 +169,22 @@
             var subscription = _proxy.Subscribe(eventToBind.MethodName);
             subscription.Received += innerHandler;
             DisposalActions.Add(() => subscription.Received -= innerHandler);
+        }
+
+
+        void WaitForConnection()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            while (_conn.State != ConnectionState.Connected)
+            {
+                if (sw.Elapsed > _conn.TotalTransportConnectTimeout)
+                {
+                    throw new TimeoutException("Connection was disconnected during an attempted request");
+                }
+                Thread.Sleep(100);
+            }
+            sw.Stop();
         }
 
         private T Convert<T>(JToken obj)
