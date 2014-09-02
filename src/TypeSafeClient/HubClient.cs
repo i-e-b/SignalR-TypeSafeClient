@@ -39,6 +39,12 @@
         {
             _conn = conn;
             _proxy = proxy;
+            var oldActs = DisposalActions.ToArray();
+            DisposalActions.Clear();
+            foreach (var dispose in oldActs)
+            {
+                dispose();
+            }
         }
 
         /// <summary>
@@ -177,7 +183,9 @@
         {
             var subscription = _proxy.Subscribe(eventToBind.MethodName);
             subscription.Received += innerHandler;
-            DisposalActions.Add(() => subscription.Received -= innerHandler);
+            DisposalActions.Add(() => {
+                subscription.Received -= innerHandler;
+            });
         }
 
 
