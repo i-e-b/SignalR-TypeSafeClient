@@ -14,12 +14,12 @@
     /// </summary>
     /// <typeparam name="TCalls">Contract of messages for which the Hub will listen</typeparam>
     /// <typeparam name="TEvents">Contract of messages the Hub might send</typeparam>
-    public class HubClient<TCalls, TEvents> : IHubClient<TCalls, TEvents>
+    public class HubClient<TCalls, TEvents> : IHubClient<TCalls, TEvents>, IHubClientDiagnostics
     {
         /// <summary> Events to be unbound on disconnect </summary>
         public readonly List<Action> DisposalActions;
-        private readonly IConnection _conn;
-        private readonly IHubProxy _proxy;
+        private IConnection _conn;
+        private IHubProxy _proxy;
 
         /// <summary>
         /// Connect directly to a connected proxy
@@ -30,6 +30,15 @@
             _conn = conn;
 
             DisposalActions = new List<Action>();
+        }
+
+        /// <summary>
+        /// Replace connection and proxy. Use with caution!
+        /// </summary>
+        public void SwitchConnection(IHubProxy proxy, IConnection conn)
+        {
+            _conn = conn;
+            _proxy = proxy;
         }
 
         /// <summary>
@@ -203,6 +212,7 @@
             var dummy = DynamicProxy.GetInstanceFor<T>();
             return (T)obj.ToObject(dummy.GetType(), _proxy.JsonSerializer);
         }
+
     }
 
 }

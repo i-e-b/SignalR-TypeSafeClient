@@ -2,6 +2,7 @@ namespace TypeSafeClient
 {
     using System;
     using System.Linq.Expressions;
+    using Microsoft.AspNet.SignalR.Client;
 
     /// <summary>
     /// Connection management and dispatch for clients.
@@ -62,5 +63,16 @@ namespace TypeSafeClient
         /// </summary>
         /// <param name="call">Expression calling to hub. Use like <code>var helloWorld = RequestFromHub&lt;string&gt;(hub => hub.GetGreeting("world"))</code></param>
         TResult RequestFromHub<TResult>(Expression<Func<TCalls, TResult>> call);
+    }
+
+    /// <summary>
+    /// Exposes diagnostic and advanced methods of Hub Clients
+    /// </summary>
+    public interface IHubClientDiagnostics
+    {
+        /// <summary>
+        /// Remove existing connection and proxy, replace with a new set.
+        /// </summary>
+        void SwitchConnection(IHubProxy proxy, IConnection conn);
     }
 }
