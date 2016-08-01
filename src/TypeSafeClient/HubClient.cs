@@ -1,4 +1,7 @@
-﻿namespace TypeSafeClient
+﻿using System.Threading.Tasks;
+using TypeSafeClient.Extensions;
+
+namespace TypeSafeClient
 {
     using System;
     using System.Collections.Generic;
@@ -75,8 +78,8 @@
         {
             Action<IList<JToken>> threadedAction = list =>
             {
-                var thread = new Thread(() => action(list));
-                thread.Start();
+				// Note: Aleksandar Toplek, 2016.08.02 Using Task instead of Thread because Thread is not supported in WinRT
+				Task.Run(() => action(list));
             };
             return threadedAction;
         }
@@ -199,7 +202,13 @@
                 {
                     throw new TimeoutException("Connection was disconnected during an attempted request");
                 }
-                Thread.Sleep(100);
+
+				// Note: Aleksandar Toplek, 2016.08.02 WinRT version of Thread.Sleep
+#if WIN81
+				new ManualResetEvent(false).WaitOne(100);
+#else
+				Thread.Sleep(100);
+#endif
             }
             sw.Stop();
         }
@@ -212,12 +221,17 @@
                 return default(T);
             }
 
-            // Because newtonsoft json can't handle interfaces.
-            if (!typeof(T).IsInterface && !typeof(T).IsAbstract)
+			// Because newtonsoft json can't handle interfaces.
+			// Note: Aleksandar Toplek, 2016.08.02 Using extension methods to distinguish between WinRT and .NET (WinRT needs method call to retrieve type info)
+			if (!typeof(T).IsInterface() && !typeof(T).IsAbstract())
             {
                 return obj.ToObject<T>(_proxy.JsonSerializer);
             }
-            var dummy = DynamicProxy.GetInstanceFor<T>();
+
+			// Note: Aleksandar Toplek, 2016.08.02 Using Castle DynamicProxy instead of custom to enable WinRT support
+	        var proxyGenerator = new Castle.DynamicProxy.ProxyGenerator();
+	        var dummy = proxyGenerator.CreateInterfaceProxyWithTargetInterface(typeof(T));
+
             return (T)obj.ToObject(dummy.GetType(), _proxy.JsonSerializer);
         }
 

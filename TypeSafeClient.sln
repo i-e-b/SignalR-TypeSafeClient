@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSafeClient", "src\TypeSafeClient\TypeSafeClient.csproj", "{3C0AD799-948F-488C-B0C9-CBEE33288C06}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSafeClientTests", "src\TypeSafeClientTests\TypeSafeClientTests.csproj", "{0654FA84-6EC0-44D7-9636-AC5FF7A2F392}"
@@ -9,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Info", "_Info", "{6B6771CB
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSafeClient.Windows81", "src\TypeSafeClient.Windows81\TypeSafeClient.Windows81.csproj", "{BAC256B8-E7C4-46A4-BB96-FE6F1F8B2914}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +28,10 @@ Global
 		{0654FA84-6EC0-44D7-9636-AC5FF7A2F392}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0654FA84-6EC0-44D7-9636-AC5FF7A2F392}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0654FA84-6EC0-44D7-9636-AC5FF7A2F392}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAC256B8-E7C4-46A4-BB96-FE6F1F8B2914}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAC256B8-E7C4-46A4-BB96-FE6F1F8B2914}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAC256B8-E7C4-46A4-BB96-FE6F1F8B2914}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAC256B8-E7C4-46A4-BB96-FE6F1F8B2914}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
